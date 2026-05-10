@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/user_model.dart';
+import '../../services/cloudinary_service.dart';
 import '../../services/firestore_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/common_widgets.dart';
@@ -17,11 +21,8 @@ class _PostMkekaScreenState extends State<PostMkekaScreen> {
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _oddsCtrl = TextEditingController();
-  final _imageUrlCtrls = [
-    TextEditingController(),
-    TextEditingController(),
-    TextEditingController(),
-  ];
+  final _picker = ImagePicker();
+  final List<XFile> _pickedImages = [];
 
   bool _isVip = false;
   bool _loading = false;
@@ -32,9 +33,6 @@ class _PostMkekaScreenState extends State<PostMkekaScreen> {
     _titleCtrl.dispose();
     _descCtrl.dispose();
     _oddsCtrl.dispose();
-    for (final controller in _imageUrlCtrls) {
-      controller.dispose();
-    }
     super.dispose();
   }
 
@@ -58,19 +56,65 @@ class _PostMkekaScreenState extends State<PostMkekaScreen> {
     if (picked != null) setState(() => _matchDate = picked);
   }
 
+  Future<void> _pickImages() async {
+    if (_pickedImages.length >= 3) {
+      showError(context, 'Unaweza kuweka picha zisizozidi 3.');
+      return;
+    }
+
+    final images = await _picker.pickMultiImage(imageQuality: 82);
+    if (images.isEmpty) return;
+
+    final remainingSlots = 3 - _pickedImages.length;
+    setState(() {
+      _pickedImages.addAll(images.take(remainingSlots));
+    });
+
+    if (images.length > remainingSlots && mounted) {
+      showError(context, 'Tumepokea picha 3 tu kwa mkeka mmoja.');
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() => _pickedImages.removeAt(index));
+  }
+
   Future<void> _post() async {
     if (_titleCtrl.text.trim().isEmpty) {
       showError(context, 'Weka kichwa cha mkeka wako.');
       return;
     }
 
-    final imageUrls = _imageUrlCtrls.map((c) => c.text.trim()).toList();
-    if (imageUrls.every((url) => url.isEmpty)) {
-      showError(context, 'Weka link angalau moja ya picha ya mkeka.');
+    if (_pickedImages.isEmpty) {
+      showError(context, 'Chagua angalau picha moja ya mkeka.');
       return;
     }
 
     setState(() => _loading = true);
+
+    final imageUrls = <String>[];
+    for (final image in _pickedImages) {
+      try {
+        final url = await CloudinaryService.uploadImage(File(image.path));
+        if (url == null) {
+          throw const CloudinaryUploadException('Cloudinary haijarudisha URL.');
+        }
+        imageUrls.add(url);
+      } on CloudinaryUploadException catch (e) {
+        if (!mounted) return;
+        setState(() => _loading = false);
+        showError(
+          context,
+          'Upload imeshindikana: ${e.message}',
+        );
+        return;
+      } catch (_) {
+        if (!mounted) return;
+        setState(() => _loading = false);
+        showError(context, 'Upload ya picha imeshindikana. Jaribu tena.');
+        return;
+      }
+    }
 
     final result = await FirestoreService.postMkekaWithImageUrls(
       tipster: widget.tipster,
@@ -92,12 +136,10 @@ class _PostMkekaScreenState extends State<PostMkekaScreen> {
       _titleCtrl.clear();
       _descCtrl.clear();
       _oddsCtrl.clear();
-      for (final controller in _imageUrlCtrls) {
-        controller.clear();
-      }
       setState(() {
         _isVip = false;
         _matchDate = null;
+        _pickedImages.clear();
       });
     } else {
       showError(context, result.message);
@@ -234,35 +276,107 @@ class _PostMkekaScreenState extends State<PostMkekaScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Image Links za Mkeka',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Firestore itahifadhi links tu. Weka direct image URL 1 hadi 3.',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
-            ),
-            const SizedBox(height: 12),
-            ...List.generate(_imageUrlCtrls.length, (index) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: TextFormField(
-                  controller: _imageUrlCtrls[index],
-                  style: const TextStyle(fontSize: 13),
-                  keyboardType: TextInputType.url,
-                  decoration: InputDecoration(
-                    labelText: index == 0
-                        ? 'Image URL ${index + 1} (required)'
-                        : 'Image URL ${index + 1} (optional)',
-                    prefixIcon: const Icon(
-                      Icons.link,
-                      color: AppColors.textHint,
-                    ),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Picha za Mkeka',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                   ),
                 ),
-              );
-            }),
+                Text(
+                  '${_pickedImages.length}/3',
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: _loading ? null : _pickImages,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.cloud_upload_outlined,
+                      color: AppColors.neonGreen,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Chagua picha kutoka gallery',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Icon(Icons.add_photo_alternate_outlined,
+                        color: AppColors.textHint),
+                  ],
+                ),
+              ),
+            ),
+            if (_pickedImages.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 94,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _pickedImages.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  itemBuilder: (context, index) {
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            File(_pickedImages[index].path),
+                            width: 94,
+                            height: 94,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          right: 4,
+                          top: 4,
+                          child: GestureDetector(
+                            onTap: _loading ? null : () => _removeImage(index),
+                            child: Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.62),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -273,7 +387,7 @@ class _PostMkekaScreenState extends State<PostMkekaScreen> {
                 ),
               ),
               child: const Text(
-                'Note: assets/images ni read-only baada ya app kujengwa. Kama picha za gallery zinahitaji kuonekana kwa users wote, tutatumia Firebase Storage au image hosting.',
+                'Picha zita-uploadiwa Cloudinary, kisha Firestore itahifadhi image URLs tu.',
                 style: TextStyle(color: AppColors.neonGreen, fontSize: 11),
               ),
             ),

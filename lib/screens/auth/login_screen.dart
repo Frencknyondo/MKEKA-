@@ -78,27 +78,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 48),
 
                 // Brand
-                Center(
+                const Center(
                   child: Column(
                     children: [
-                      Container(
-                        width: 70,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          color: AppColors.neonGreen.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppColors.neonGreen.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.sports_soccer,
-                          color: AppColors.neonGreen,
-                          size: 36,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
+                      BrandLogo(size: 78),
+                      SizedBox(height: 16),
+                      Text(
                         'MKEKA PLUS',
                         style: TextStyle(
                           fontSize: 22,
@@ -119,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'Ingia kuona mabao ya leo',
+                  'Ingia kuona mikeka ya leo',
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
 

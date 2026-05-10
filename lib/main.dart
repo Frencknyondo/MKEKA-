@@ -10,6 +10,7 @@ import 'screens/main_shell.dart';
 import 'services/auth_service.dart';
 import 'services/firestore_service.dart';
 import 'utils/app_theme.dart';
+import 'widgets/common_widgets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,26 +84,15 @@ class _SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: AppColors.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                color: AppColors.neonGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                    color: AppColors.neonGreen.withValues(alpha: 0.3)),
-              ),
-              child: const Icon(Icons.sports_soccer,
-                  color: AppColors.neonGreen, size: 48),
-            ),
-            const SizedBox(height: 20),
-            const Text(
+            BrandLogo(size: 90),
+            SizedBox(height: 20),
+            Text(
               'MKEKA PLUS',
               style: TextStyle(
                 fontSize: 24,
@@ -111,11 +101,11 @@ class _SplashScreen extends StatelessWidget {
                 letterSpacing: 3,
               ),
             ),
-            const SizedBox(height: 6),
-            const Text('Smart Prediction Hub',
+            SizedBox(height: 6),
+            Text('Smart Prediction Hub',
                 style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-            const SizedBox(height: 40),
-            const SizedBox(
+            SizedBox(height: 40),
+            SizedBox(
               width: 24,
               height: 24,
               child: CircularProgressIndicator(

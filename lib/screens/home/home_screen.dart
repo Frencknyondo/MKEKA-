@@ -16,6 +16,10 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.all(8),
+          child: BrandLogo(size: 40, dark: true),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -23,11 +27,11 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.neonGreen,
+                    color: Color.fromARGB(255, 251, 252, 252),
                     letterSpacing: 1.5)),
             Text('Habari ${user.name.split(' ').first}!',
                 style: const TextStyle(
-                    fontSize: 12, color: AppColors.textSecondary)),
+                    fontSize: 12, color: Color.fromARGB(255, 254, 255, 255))),
           ],
         ),
         actions: [

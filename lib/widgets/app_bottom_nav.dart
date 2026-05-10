@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/app_theme.dart';
+
 class AppBottomNavItem {
   final IconData icon;
   final String label;
@@ -45,8 +47,7 @@ class AppBottomNav extends StatelessWidget {
             children: List.generate(items.length, (index) {
               final item = items[index];
               final selected = index == currentIndex;
-              final color =
-                  selected ? const Color(0xFF2F80FF) : const Color(0xFF8D93A3);
+              final color = selected ? AppColors.primary : AppColors.textHint;
 
               return Expanded(
                 child: InkWell(
@@ -60,9 +61,8 @@ class AppBottomNav extends StatelessWidget {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: selected
-                              ? const Color(0xFF2F80FF)
-                              : Colors.transparent,
+                          color:
+                              selected ? AppColors.primary : Colors.transparent,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(

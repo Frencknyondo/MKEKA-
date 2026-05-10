@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 import '../models/mkeka_model.dart';
+import '../models/tip_model.dart';
 import '../models/user_model.dart';
 
 class FirestoreService {
@@ -173,8 +174,7 @@ class FirestoreService {
 
       return PostResult(success: true, message: 'Mkeka wako umechapishwa!');
     } catch (e) {
-      return PostResult(
-          success: false, message: 'Imeshindwa kuchapisha: $e');
+      return PostResult(success: false, message: 'Imeshindwa kuchapisha: $e');
     }
   }
 
@@ -197,6 +197,17 @@ class FirestoreService {
         await _recalculateWinRate(tipsterId);
       }
     }
+  }
+
+  static Future<void> toggleMkekaFeatured(
+      String mkekaId, bool isFeatured) async {
+    await _db.collection('mkekas').doc(mkekaId).update({
+      'isFeatured': isFeatured,
+    });
+  }
+
+  static Future<void> deleteMkeka(String mkekaId) async {
+    await _db.collection('mkekas').doc(mkekaId).delete();
   }
 
   static Future<void> _recalculateWinRate(String tipsterId) async {
@@ -357,6 +368,65 @@ class FirestoreService {
       'createdAt': FieldValue.serverTimestamp(),
     });
     await _db.collection('users').doc(userId).update({'role': 'tipster'});
+  }
+
+  // Tips
+
+  static Stream<List<AppTip>> streamTips({bool includeInactive = false}) {
+    return _db
+        .collection('tips')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      final tips = snapshot.docs.map(AppTip.fromFirestore).toList();
+      if (includeInactive) return tips;
+      return tips.where((tip) => tip.isActive).toList();
+    });
+  }
+
+  static Stream<List<AppTip>> streamVisibleTips(AppUser user) {
+    return streamTips().map((tips) {
+      return tips
+          .where((tip) => !tip.isVip || user.isSubscriptionActive)
+          .toList();
+    });
+  }
+
+  static Future<void> addTip({
+    required String title,
+    required String content,
+    required bool isVip,
+    required bool isActive,
+  }) async {
+    final tip = AppTip(
+      id: '',
+      title: title,
+      content: content,
+      isVip: isVip,
+      isActive: isActive,
+      createdAt: DateTime.now(),
+    );
+    await _db.collection('tips').add(tip.toMap());
+  }
+
+  static Future<void> updateTip({
+    required String tipId,
+    required String title,
+    required String content,
+    required bool isVip,
+    required bool isActive,
+  }) async {
+    await _db.collection('tips').doc(tipId).update({
+      'title': title.trim(),
+      'content': content.trim(),
+      'isVip': isVip,
+      'isActive': isActive,
+      'updatedAt': Timestamp.fromDate(DateTime.now()),
+    });
+  }
+
+  static Future<void> deleteTip(String tipId) async {
+    await _db.collection('tips').doc(tipId).delete();
   }
 }
 

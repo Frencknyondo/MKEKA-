@@ -27,6 +27,7 @@ dependencies:
   image_picker: ^1.1.2
   cached_network_image: ^3.4.1
   shimmer: ^3.0.0
+  http: ^1.2.1
 
   # Share
   share_plus: ^10.0.2
@@ -36,13 +37,33 @@ dependencies:
   intl: ^0.19.0
   shared_preferences: ^2.3.2
   uuid: ^4.5.1
-
+  provider: ^6.1.5+1
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/
+
+# Launcher Icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  web:
+    generate: true
+  image_path: "assets/images/app_logo.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/images/app_logo.png"
+
+# Native Splash
+flutter_native_splash:
+  image: assets/images/splash.png
+  color: "#ffffff"  # Light background
+  android_12:
+    image: assets/images/splash.png
+    color: "#ffffff"

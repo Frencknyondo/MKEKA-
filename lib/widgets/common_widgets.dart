@@ -1,6 +1,32 @@
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
 
+class BrandLogo extends StatelessWidget {
+  final double size;
+  final bool dark;
+  final BoxFit fit;
+
+  const BrandLogo({
+    super.key,
+    this.size = 72,
+    this.dark = false,
+    this.fit = BoxFit.contain,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(size * 0.22),
+      child: Image.asset(
+        dark ? 'assets/images/dark_logo.png' : 'assets/images/app_logo.png',
+        width: size,
+        height: size,
+        fit: fit,
+      ),
+    );
+  }
+}
+
 // ─── NEON BUTTON ─────────────────────────────────────────────────────────────
 
 class NeonButton extends StatelessWidget {
