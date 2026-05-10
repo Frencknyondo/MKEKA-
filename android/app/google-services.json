@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "962251093481",
+    "project_id": "mkekaplus-40e15",
+    "storage_bucket": "mkekaplus-40e15.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962251093481:android:2122e38284ba92acecc778",
+        "android_client_info": {
+          "package_name": "com.example.mkekaplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "962251093481-s5ocq6gutlgbq57q6jjuib0ivhs1ee30.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mkekaplus",
+            "certificate_hash": "a233a3bdf2b0bba8870e56e15a65f023507bc4c5"
+          }
+        },
+        {
+          "client_id": "962251093481-4g5c5mq4qcrlkfp47j4kjsggf1amln3b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA--oFrvYaRzbcwEZmqtra4WyhdGkmn_Pk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "962251093481-4g5c5mq4qcrlkfp47j4kjsggf1amln3b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

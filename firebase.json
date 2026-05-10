@@ -1,17 +1,1 @@
-{
-  "firestore": {
-    "database": "(default)",
-    "location": "africa-south1",
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "auth": {
-    "providers": {
-      "emailPassword": true,
-      "googleSignIn": {
-        "oAuthBrandDisplayName": "mkekaplus",
-        "supportEmail": "fbenson373@gmail.com"
-      }
-    }
-  }
-}
+{"firestore":{"database":"(default)","location":"africa-south1","rules":"firestore.rules","indexes":"firestore.indexes.json"},"auth":{"providers":{"emailPassword":true,"googleSignIn":{"oAuthBrandDisplayName":"mkekaplus","supportEmail":"fbenson373@gmail.com"}}},"flutter":{"platforms":{"android":{"buildConfigurations":{".":{"projectId":"mkekaplus-40e15","appId":"1:962251093481:android:2122e38284ba92acecc778","fileOutput":"android/app/google-services.json"}}},"dart":{"lib/firebase_options.dart":{"projectId":"mkekaplus-40e15","configurations":{"android":"1:962251093481:android:2122e38284ba92acecc778"}}}}}}
